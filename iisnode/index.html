@@ -1,0 +1,87 @@
+<html>
+<head>
+    <title>iisnode logs</title>
+    <style type="text/css">
+        body
+        {
+            font-family: "Trebuchet MS" , Arial, Helvetica, sans-serif;
+        }
+        table
+        {
+            border-collapse: collapse;
+        }
+        td, th
+        {
+            border: 1px solid lightgray;
+            padding: 3px 7px 2px 7px;
+        }
+        th
+        {
+            text-align: left;
+            padding-top: 5px;
+            padding-bottom: 4px;
+            background-color: Gray;
+            color: #ffffff;
+        }
+        td.stderr
+        {
+            color: Red;
+        }
+    </style>
+</head>
+<body>
+    <table id="logFilesTable">
+        <tr>
+            <th>
+                Computer name
+            </th>
+            <th>
+                PID
+            </th>
+            <th>
+                Type
+            </th>
+            <th>
+                Created
+            </th>
+            <th>
+                Link
+            </th>
+        </tr>
+    </table>
+    <p id="lastUpdated"></p>
+    <script type="text/javascript">
+
+        // this is replaced with actual data at runtime by code in interceptor.js
+        var logFiles = [{"file":"CTPL-SERVER-01-10228-stderr-1781694030303.txt","computername":"CTPL-SERVER-01","pid":10228,"type":"stderr","created":1781694030303},{"file":"CTPL-SERVER-01-10228-stdout-1781694030299.txt","computername":"CTPL-SERVER-01","pid":10228,"type":"stdout","created":1781694030299},{"file":"CTPL-SERVER-01-11300-stderr-1781688132805.txt","computername":"CTPL-SERVER-01","pid":11300,"type":"stderr","created":1781688132805},{"file":"CTPL-SERVER-01-11300-stdout-1781688132803.txt","computername":"CTPL-SERVER-01","pid":11300,"type":"stdout","created":1781688132803},{"file":"CTPL-SERVER-01-11532-stderr-1781683003882.txt","computername":"CTPL-SERVER-01","pid":11532,"type":"stderr","created":1781683003882},{"file":"CTPL-SERVER-01-11532-stdout-1781683003881.txt","computername":"CTPL-SERVER-01","pid":11532,"type":"stdout","created":1781683003881},{"file":"CTPL-SERVER-01-12016-stderr-1781686563057.txt","computername":"CTPL-SERVER-01","pid":12016,"type":"stderr","created":1781686563057},{"file":"CTPL-SERVER-01-12016-stdout-1781686563055.txt","computername":"CTPL-SERVER-01","pid":12016,"type":"stdout","created":1781686563055},{"file":"CTPL-SERVER-01-1912-stderr-1781687433403.txt","computername":"CTPL-SERVER-01","pid":1912,"type":"stderr","created":1781687433403},{"file":"CTPL-SERVER-01-1912-stdout-1781687433401.txt","computername":"CTPL-SERVER-01","pid":1912,"type":"stdout","created":1781687433401},{"file":"CTPL-SERVER-01-2368-stderr-1781682659106.txt","computername":"CTPL-SERVER-01","pid":2368,"type":"stderr","created":1781682659106},{"file":"CTPL-SERVER-01-2368-stdout-1781682659105.txt","computername":"CTPL-SERVER-01","pid":2368,"type":"stdout","created":1781682659105},{"file":"CTPL-SERVER-01-2480-stderr-1781688088804.txt","computername":"CTPL-SERVER-01","pid":2480,"type":"stderr","created":1781688088804},{"file":"CTPL-SERVER-01-2480-stdout-1781688088802.txt","computername":"CTPL-SERVER-01","pid":2480,"type":"stdout","created":1781688088802},{"file":"CTPL-SERVER-01-3276-stderr-1781683154405.txt","computername":"CTPL-SERVER-01","pid":3276,"type":"stderr","created":1781683154405},{"file":"CTPL-SERVER-01-3276-stdout-1781683154403.txt","computername":"CTPL-SERVER-01","pid":3276,"type":"stdout","created":1781683154403},{"file":"CTPL-SERVER-01-6884-stderr-1781694126363.txt","computername":"CTPL-SERVER-01","pid":6884,"type":"stderr","created":1781694126363},{"file":"CTPL-SERVER-01-6884-stdout-1781694126360.txt","computername":"CTPL-SERVER-01","pid":6884,"type":"stdout","created":1781694126360},{"file":"CTPL-SERVER-01-8140-stderr-1781682116383.txt","computername":"CTPL-SERVER-01","pid":8140,"type":"stderr","created":1781682116383},{"file":"CTPL-SERVER-01-8140-stdout-1781682116383.txt","computername":"CTPL-SERVER-01","pid":8140,"type":"stdout","created":1781682116383},{"file":"CTPL-SERVER-01-8924-stderr-1781689984865.txt","computername":"CTPL-SERVER-01","pid":8924,"type":"stderr","created":1781689984865},{"file":"CTPL-SERVER-01-8924-stdout-1781689984862.txt","computername":"CTPL-SERVER-01","pid":8924,"type":"stdout","created":1781689984862}];
+        var lastUpdated = 1781694127545;
+        var date = new Date();
+
+        date.setTime(lastUpdated);
+        document.getElementById('lastUpdated').innerHTML = 'Index was last updated ' + date;
+
+        logFiles.sort(function (a, b) {
+            return b.created - a.created;
+        });
+
+        var logFilesTable = document.getElementById("logFilesTable");
+        for (var i = 0; i < logFiles.length; i++) {
+            var logFile = logFiles[i];
+            date.setTime(logFile.created);
+            var row = logFilesTable.insertRow(-1);
+            var computerNameCell = row.insertCell(0);
+            var pidCell = row.insertCell(1);
+            var typeCell = row.insertCell(2);
+            var dateCell = row.insertCell(3);
+            var logCell = row.insertCell(4);
+            computerNameCell.innerHTML = logFile.computername;
+            pidCell.innerHTML = logFile.pid.toString();
+            typeCell.innerHTML = logFile.type;
+            typeCell.setAttribute('class', logFile.type);
+            dateCell.innerHTML = date.toString();
+            logCell.innerHTML = '<a href="' + logFile.file + '">log</a>';
+        };
+
+    </script>
+</body>
+</html>
