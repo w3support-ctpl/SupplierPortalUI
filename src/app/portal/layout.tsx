@@ -32,6 +32,7 @@ const navItems = [
   { label: "My Invoices", href: "/portal/invoices", icon: "receipt_long" },
   { label: "My Messages", href: "/portal/messages", icon: "mail" },
   { label: "My Reports", href: "/portal/reports", icon: "bar_chart" },
+  { label: "My Contracts", href: "/portal/my_contracts", icon: "contract" },
 ];
 
 export default function PortalLayout({ children }: { children: React.ReactNode }) {

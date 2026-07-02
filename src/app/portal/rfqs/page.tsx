@@ -60,12 +60,17 @@ interface RFQ {
   RFQNumber: string;
   QDate: string;
   Status: string;
-  OrderQty: string;
+  ValidUntil?: string;
   Material: string;
-  UnitPrice: string;
-  Quatation: string;
+  MaterialDecription?: string;
+  Item?: string;
+  Supplier?: string;
+  OrderQty?: string;
+  UnitPrice?: string;
+  Quatation?: string;
   TotalValue?: string;
   QuantityUnit?: string;
+  UOM?: string;
 }
 
 export default function RFQPage() {
@@ -128,7 +133,7 @@ export default function RFQPage() {
     if (materialTypes.trim()) queryParams.append("Material", materialTypes.trim());
 
     try {
-      const res = await fetch(`/api/incomingRFQSFilter?${queryParams.toString()}`);
+      const res = await fetch(`/api/incomingRfqs?${queryParams.toString()}`);
       if (!res.ok) {
         setError("Failed to fetch incoming RFQs (Session may have expired)");
         setRfqs([]);
@@ -139,11 +144,15 @@ export default function RFQPage() {
       const list = data.value || data || [];
 
       setRfqs(list.map((item: any) => ({
-        RFQNumber: item.RFQNumber || item.RequestForQuotation || "RFQ-7000000001",
-        QDate: item.QDate || "2026-06-01",
+        RFQNumber: item.RFQ || item.RFQNumber || item.RequestForQuotation || "RFQ-7000000001",
+        QDate: item.RFQDate || item.QDate || "2026-06-01",
         Status: item.Status || "Active",
-        OrderQty: item.OrderQty || item.RequiredQuantity || "500",
+        ValidUntil: item.ValidUntil || "—",
         Material: item.Material || "N/A",
+        MaterialDecription: item.MaterialDecription || "—",
+        Item: item.Item || "—",
+        Supplier: item.Supplier || "—",
+        OrderQty: item.OrderQty || item.RequiredQuantity || "500",
         UnitPrice: item.UnitPrice || "120.00",
         Quatation: item.Quatation || item.Quotation || "—"
       })));
@@ -165,7 +174,7 @@ export default function RFQPage() {
     setRfqLineItems([]);
     setLoadingDetails(true);
     try {
-      const res = await fetch(`/api/incomingRFQSFilter?RFQNumber=${rfqNum}`);
+      const res = await fetch(`/api/incomingRfqs?RFQNumber=${rfqNum}`);
       if (!res.ok) {
         console.error("Failed to fetch RFQ details");
         setRfqLineItems(rfqs.filter(r => r.RFQNumber === rfqNum));
@@ -174,11 +183,15 @@ export default function RFQPage() {
       const data = await res.json();
       const items = data.value || data || [];
       setRfqLineItems(items.map((item: any) => ({
-        RFQNumber: item.RFQNumber || rfqNum,
-        QDate: item.QDate || "2026-06-01",
+        RFQNumber: item.RFQ || item.RFQNumber || rfqNum,
+        QDate: item.RFQDate || item.QDate || "2026-06-01",
         Status: item.Status || "Active",
-        OrderQty: item.OrderQty || item.RequiredQuantity || "500",
+        ValidUntil: item.ValidUntil || "—",
         Material: item.Material || "N/A",
+        MaterialDecription: item.MaterialDecription || "—",
+        Item: item.Item || "—",
+        Supplier: item.Supplier || "—",
+        OrderQty: item.OrderQty || item.RequiredQuantity || "500",
         UnitPrice: item.UnitPrice || "120.00",
         Quatation: item.Quatation || item.Quotation || "—",
         UOM: item.UOM || "EA"
@@ -194,7 +207,7 @@ export default function RFQPage() {
 
   const handleOpenBidModal = (rfq: RFQ) => {
     setSelectedRFQ(rfq);
-    setBidPrice(rfq.UnitPrice);
+    setBidPrice(rfq.UnitPrice || "");
     setLeadTime("7");
     setValidUntil("");
     setComments("");
@@ -362,20 +375,17 @@ export default function RFQPage() {
                   <tr>
                     <th>RFQ</th>
                     <th>RFQ Date</th>
-                    <th className="text-center">Status</th>
-                    <th className="text-right">Valid Unit (Qty)</th>
+                    <th >Status</th>
+                    <th >Valid Until</th>
                     <th>Material</th>
-                    <th className="text-right">Total Value</th>
+                    <th>Material Decription</th>
                     <th>Item</th>
-                    <th className="text-center">Action</th>
+                    <th>Supplier</th>
+                    <th >Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {currentItems.map((rfq, idx) => {
-                    const orderQty = parseFloat(String(rfq.OrderQty || '0').replace(/,/g, '')) || 0;
-                    const unitPrice = parseFloat(String(rfq.UnitPrice || '0').replace(/,/g, '')) || 0;
-                    const totalVal = (orderQty * unitPrice).toLocaleString("en-IN", { maximumFractionDigits: 2 });
-
                     return (
                       <tr key={idx} className="hover:bg-slate-50/50">
                         <td>
@@ -388,11 +398,12 @@ export default function RFQPage() {
                           </button>
                         </td>
                         <td className="text-slate-500">{formatDate(rfq.QDate)}</td>
-                        <td className="text-center">{statusBadge(rfq.Status)}</td>
-                        <td className="text-right font-extrabold text-slate-800">{rfq.OrderQty}</td>
+                        <td className="font-bold text-slate-800">{rfq.Status}</td>
+                        <td>{formatDate(rfq.ValidUntil || "")}</td>
                         <td className="font-bold text-slate-800">{rfq.Material}</td>
-                        <td className="text-right font-extrabold text-slate-800">₹{totalVal}</td>
-                        <td className="text-slate-400 italic font-medium">{rfq.Quatation}</td>
+                        <td className="text-slate-600">{rfq.MaterialDecription}</td>
+                        <td className="text-slate-800">{rfq.Item}</td>
+                        <td className="text-slate-800">{rfq.Supplier}</td>
 
                         {/* Action popover menu */}
                         <td className="text-center relative">
@@ -713,7 +724,7 @@ export default function RFQPage() {
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-slate-500 font-medium">Status</span>
-                      <span>{rfqLineItems.length > 0 ? statusBadge(rfqLineItems[0].Status) : "Open"}</span>
+                      <span>{rfqLineItems.length > 0 ? rfqLineItems[0].Status : "Open"}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-slate-500 font-medium">Company</span>
